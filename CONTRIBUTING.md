@@ -21,6 +21,8 @@ yarn compile
 yarn test
 ```
 
+For deployments, use the Hardhat keystore for secrets instead of project `.env` files.
+
 ### Web
 
 ```bash

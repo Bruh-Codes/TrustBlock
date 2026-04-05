@@ -4,7 +4,12 @@
   "type": "module",
   "scripts": {
     "test": "npx hardhat test",
-    "compile": "npx hardhat compile"
+    "compile": "npx hardhat compile",
+    "deploy:arbitrum": "npx hardhat ignition deploy ignition/modules/EscrowModule.ts --network arbitrum --deployment-id chain-42161",
+    "deploy:arbitrum-sepolia": "npx hardhat ignition deploy ignition/modules/EscrowModule.ts --network arbitrumSepolia --deployment-id chain-421614",
+    "export:web-deployment": "node scripts/export-web-deployment.js",
+    "export:web:arbitrum": "node scripts/export-web-deployment.js --deployment-id chain-42161 --deployment-key arbitrum --token-address 0xaf88d065e77c8cC2239327C5EDb3A432268e5831 --token-symbol USDC --token-decimals 6",
+    "export:web:arbitrum-sepolia": "node scripts/export-web-deployment.js --deployment-id chain-421614 --deployment-key arbitrumSepolia --token-address 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d --token-symbol USDC --token-decimals 6"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^4.0.6",

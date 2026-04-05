@@ -32,13 +32,6 @@ What is implemented today:
 - production-grade UI for escrow drafting and monitoring
 - Reown AppKit wallet connection with wagmi in the frontend
 
-What is not fully wired yet:
-
-- frontend write integration to live escrow contract methods
-- frontend read integration to onchain escrow data
-- deployed contract addresses and production environment configuration
-- indexer or backend services for analytics and historical queries
-
 ## Repository Structure
 
 ```text
@@ -74,6 +67,15 @@ yarn compile
 yarn test
 ```
 
+For network deployments, use Hardhat config variables backed by the Hardhat keystore instead of storing secrets in `.env` files:
+
+```bash
+npx hardhat keystore set ARBITRUM_RPC_URL
+npx hardhat keystore set ARBITRUM_PRIVATE_KEY
+npx hardhat keystore set ARBITRUM_SEPOLIA_RPC_URL
+npx hardhat keystore set ARBITRUM_SEPOLIA_PRIVATE_KEY
+```
+
 ### Web app
 
 ```bash
@@ -86,7 +88,10 @@ If you want wallet connection enabled in the web app, create `apps/web/.env.loca
 
 ```bash
 NEXT_PUBLIC_REOWN_PROJECT_ID=your_reown_project_id
+NEXT_PUBLIC_ESCROW_DEPLOYMENT=arbitrumSepolia
 ```
+
+Switch `NEXT_PUBLIC_ESCROW_DEPLOYMENT` to `arbitrum` to target the mainnet deployment registry.
 
 ## Docs
 

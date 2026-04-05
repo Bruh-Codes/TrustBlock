@@ -1,0 +1,45 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-f96ca28ac314674b1fdec4fec76e2b337d65948c",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/EscrowReader.sol": "project/contracts/EscrowReader.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/EscrowReader.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.28;\n\nimport \"./IEscrowReaderSource.sol\";\nimport \"./Types.sol\";\n\ncontract EscrowReader {\n    IEscrowReaderSource public immutable escrow;\n\n    constructor(address escrowAddress) {\n        escrow = IEscrowReaderSource(escrowAddress);\n    }\n\n    function getEscrow(\n        uint256 escrowId\n    ) external view returns (EscrowView memory escrowView) {\n        escrowView.summary = escrow.getEscrowSummary(escrowId);\n        escrowView.text = escrow.getEscrowText(escrowId);\n        escrowView.milestoneIds = escrow.getEscrowMilestoneIds(escrowId);\n        escrowView.milestones = _loadMilestones(escrowView.milestoneIds);\n    }\n\n    function getMilestone(\n        uint256 milestoneId\n    ) external view returns (MilestoneView memory milestoneView) {\n        milestoneView.summary = escrow.getMilestoneSummary(milestoneId);\n        milestoneView.text = escrow.getMilestoneText(milestoneId);\n    }\n\n    function getEscrowsForParticipant(\n        address participant\n    ) external view returns (EscrowView[] memory escrowViews) {\n        uint256[] memory escrowIds = escrow.getEscrowIdsForParticipant(participant);\n        escrowViews = new EscrowView[](escrowIds.length);\n\n        for (uint256 i = 0; i < escrowIds.length; i++) {\n            uint256 escrowId = escrowIds[i];\n            escrowViews[i].summary = escrow.getEscrowSummary(escrowId);\n            escrowViews[i].text = escrow.getEscrowText(escrowId);\n            escrowViews[i].milestoneIds = escrow.getEscrowMilestoneIds(escrowId);\n            escrowViews[i].milestones = _loadMilestones(escrowViews[i].milestoneIds);\n        }\n    }\n\n    function _loadMilestones(\n        uint256[] memory milestoneIds\n    ) internal view returns (MilestoneView[] memory milestoneViews) {\n        milestoneViews = new MilestoneView[](milestoneIds.length);\n\n        for (uint256 i = 0; i < milestoneIds.length; i++) {\n            uint256 milestoneId = milestoneIds[i];\n            milestoneViews[i].summary = escrow.getMilestoneSummary(milestoneId);\n            milestoneViews[i].text = escrow.getMilestoneText(milestoneId);\n        }\n    }\n}\n"
+      },
+      "project/contracts/IEscrowReaderSource.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.28;\n\nimport \"./Types.sol\";\n\ninterface IEscrowReaderSource {\n    function getEscrowSummary(\n        uint256 escrowId\n    ) external view returns (EscrowSummary memory);\n\n    function getEscrowText(\n        uint256 escrowId\n    ) external view returns (EscrowText memory);\n\n    function getEscrowMilestoneIds(\n        uint256 escrowId\n    ) external view returns (uint256[] memory);\n\n    function getMilestoneSummary(\n        uint256 milestoneId\n    ) external view returns (MilestoneSummary memory);\n\n    function getMilestoneText(\n        uint256 milestoneId\n    ) external view returns (MilestoneText memory);\n\n    function getEscrowIdsForParticipant(\n        address participant\n    ) external view returns (uint256[] memory);\n}\n"
+      },
+      "project/contracts/Types.sol": {
+        "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.28;\n\nenum GlobalReleaseRule {\n    DUAL_APPROVAL,\n    CLIENT_APPROVAL_AND_TIMEOUT\n}\n\nenum MilestoneReleaseRule {\n    CLIENT_APPROVAL,\n    BOTH_PARTIES_APPROVE,\n    CLIENT_APPROVAL_OR_TIMEOUT,\n    CUSTOM\n}\n\nenum RefundPolicy {\n    ON_EXPIRY_IF_UNAPPROVED,\n    MEDIATOR_CAN_SPLIT_REFUND,\n    MANUAL_ONLY\n}\n\nenum ResolverType {\n    NONE,\n    PLATFORM,\n    INDEPENDENT\n}\n\nenum EscrowStatus {\n    DRAFT,\n    AWAITING_FUNDING,\n    LIVE,\n    IN_REVIEW,\n    DISPUTED,\n    COMPLETED,\n    CANCELLED\n}\n\nenum MilestoneStatus {\n    PENDING,\n    IN_REVIEW,\n    APPROVED,\n    RELEASED,\n    REFUNDED,\n    DISPUTED,\n    RESOLVED,\n    CANCELLED\n}\n\nstruct ResolverConfig {\n    address resolver;\n    uint16 feeBps;\n    string label;\n    bool active;\n}\n\nstruct CreateEscrowInput {\n    string title;\n    string description;\n    string clientName;\n    string recipientName;\n    address recipient;\n    address token;\n    uint256 totalAmount;\n    uint64 fundingDeadline;\n    GlobalReleaseRule defaultReleaseRule;\n    RefundPolicy refundPolicy;\n    ResolverType resolverType;\n}\n\nstruct MilestoneInput {\n    string title;\n    string description;\n    uint256 amount;\n    uint64 dueDate;\n    MilestoneReleaseRule releaseRule;\n    string releaseCondition;\n}\n\nstruct EscrowData {\n    uint256 id;\n    string title;\n    string description;\n    string clientName;\n    string recipientName;\n    address client;\n    address recipient;\n    address token;\n    uint256 totalAmount;\n    uint256 fundedAmount;\n    uint256 releasedAmount;\n    uint256 refundedAmount;\n    uint64 createdAt;\n    uint64 fundingDeadline;\n    uint64 fundedAt;\n    uint64 completedAt;\n    GlobalReleaseRule defaultReleaseRule;\n    RefundPolicy refundPolicy;\n    ResolverType resolverType;\n    address resolver;\n    uint16 resolverFeeBps;\n    EscrowStatus status;\n    uint256[] milestoneIds;\n}\n\nstruct MilestoneData {\n    uint256 id;\n    uint256 escrowId;\n    string title;\n    string description;\n    uint256 amount;\n    uint64 dueDate;\n    uint64 submittedAt;\n    uint64 reviewDeadline;\n    uint64 resolvedAt;\n    MilestoneReleaseRule releaseRule;\n    RefundPolicy refundPolicy;\n    MilestoneStatus status;\n    bool clientApproved;\n    bool recipientApproved;\n    bool clientRefundApproved;\n    bool recipientRefundApproved;\n    string releaseCondition;\n}\n\nstruct EscrowSummary {\n    uint256 id;\n    address client;\n    address recipient;\n    address token;\n    uint256 totalAmount;\n    uint256 fundedAmount;\n    uint256 releasedAmount;\n    uint256 refundedAmount;\n    uint64 createdAt;\n    uint64 fundingDeadline;\n    uint64 fundedAt;\n    uint64 completedAt;\n    GlobalReleaseRule defaultReleaseRule;\n    RefundPolicy refundPolicy;\n    ResolverType resolverType;\n    address resolver;\n    uint16 resolverFeeBps;\n    EscrowStatus status;\n    uint256 milestoneCount;\n}\n\nstruct EscrowText {\n    string title;\n    string description;\n    string clientName;\n    string recipientName;\n}\n\nstruct MilestoneSummary {\n    uint256 id;\n    uint256 escrowId;\n    uint256 amount;\n    uint64 dueDate;\n    uint64 submittedAt;\n    uint64 reviewDeadline;\n    uint64 resolvedAt;\n    MilestoneReleaseRule releaseRule;\n    RefundPolicy refundPolicy;\n    MilestoneStatus status;\n    bool clientApproved;\n    bool recipientApproved;\n    bool clientRefundApproved;\n    bool recipientRefundApproved;\n}\n\nstruct MilestoneText {\n    string title;\n    string description;\n    string releaseCondition;\n}\n\nstruct MilestoneView {\n    MilestoneSummary summary;\n    MilestoneText text;\n}\n\nstruct EscrowView {\n    EscrowSummary summary;\n    EscrowText text;\n    uint256[] milestoneIds;\n    MilestoneView[] milestones;\n}\n"
+      }
+    }
+  }
+}

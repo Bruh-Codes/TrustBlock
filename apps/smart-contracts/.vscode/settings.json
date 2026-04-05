@@ -1,7 +1,3 @@
 {
-    "wake.compiler.solc.remappings": [
-        "@openzeppelin/=node_modules/@openzeppelin/",
-        "forge-std/=node_modules/forge-std/",
-        "hardhat/=node_modules/hardhat/"
-    ]
+    "wake.compiler.solc.remappings": []
 }

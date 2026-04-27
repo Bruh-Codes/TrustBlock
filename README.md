@@ -104,6 +104,9 @@ Switch `NEXT_PUBLIC_ESCROW_DEPLOYMENT` to `arbitrum` to target the mainnet deplo
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
 
+## Feedbacks
+https://docs.google.com/spreadsheets/d/1Q-HN9M1OJNaNh_1g3KFRfPq4aL0l0JI27n1Og1XO6ps/edit?resourcekey=&gid=1847759737#gid=1847759737
+
 ## Security
 
 Please report vulnerabilities according to [SECURITY.md](./SECURITY.md).

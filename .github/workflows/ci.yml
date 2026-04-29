@@ -1,0 +1,53 @@
+name: TrustBlock CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  stellar-contract-tests:
+    name: Stellar Contract Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/stellar/contract
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run contract tests
+        run: cargo test --locked
+
+  stellar-web-checks:
+    name: Stellar Web Checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/stellar/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Unit tests
+        run: yarn test
+
+      - name: Build
+        run: yarn build

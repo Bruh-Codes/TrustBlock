@@ -144,6 +144,16 @@ Switch `NEXT_PUBLIC_ESCROW_DEPLOYMENT` to `arbitrum` to target the mainnet deplo
        Evidence: responsive shell/components documented in `apps/stellar/web/README.md`.
 - [x] Minimum 8+ meaningful commits
 
+## Screenshots
+
+### Stellar app proof
+
+![Wallet options](./apps/stellar/web/screenshots/wallet-options.png)
+
+![Tests passing proof](./apps/stellar/web/screenshots/tests.png)
+
+![White belt combined proof](./apps/stellar/web/screenshots/white-belt-combined-proof.png)
+
 ## Docs
 
 - Stellar contract guide: [apps/stellar/contract/README.md](./apps/stellar/contract/README.md)

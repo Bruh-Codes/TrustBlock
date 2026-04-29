@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	AlertCircle,
 	Ban,
@@ -65,6 +65,26 @@ type WorkroomState = ReturnType<typeof createInitialWorkroomState>;
 const CONTRACT_ID = "CAQGDVXYW6YHIMLXTNCINAPCZXZ37JKLACGEWXQULYJNAGB5JJBHV4NC";
 const STELLAR_EXPLORER_BASE_URL = "https://stellar.expert/explorer/testnet";
 
+function useNowUnixSeconds() {
+	const [now, setNow] = useState<bigint>(0n);
+
+	useEffect(() => {
+		const updateNow = () => {
+			setNow(BigInt(Math.floor(Date.now() / 1000)));
+		};
+
+		const timeoutId = window.setTimeout(updateNow, 0);
+		const intervalId = window.setInterval(updateNow, 30_000);
+
+		return () => {
+			window.clearTimeout(timeoutId);
+			window.clearInterval(intervalId);
+		};
+	}, []);
+
+	return now;
+}
+
 export function EscrowDetailView({
 	escrowId,
 	onNavigate,
@@ -84,7 +104,9 @@ export function EscrowDetailView({
 	} = useEscrows();
 	const [openDisputeFor, setOpenDisputeFor] = useState<string | null>(null);
 	const [disputeReason, setDisputeReason] = useState("");
-	const [openResolutionFor, setOpenResolutionFor] = useState<string | null>(null);
+	const [openResolutionFor, setOpenResolutionFor] = useState<string | null>(
+		null,
+	);
 	const [resolutionRecipientAmount, setResolutionRecipientAmount] =
 		useState("");
 	const [resolutionDetails, setResolutionDetails] = useState("");
@@ -135,7 +157,8 @@ export function EscrowDetailView({
 		selectedDeal &&
 		selectedDeal.rawStatus === ESCROW_STATUS.AWAITING_FUNDING &&
 		participantRole === "client" &&
-		normalizedConnectedAddress === normalizeAddress(selectedDeal.clientAddress) &&
+		normalizedConnectedAddress ===
+			normalizeAddress(selectedDeal.clientAddress) &&
 		normalizedConnectedAddress !==
 			normalizeAddress(selectedDeal.recipientAddress);
 	const canCancelSelectedDeal =
@@ -170,8 +193,8 @@ export function EscrowDetailView({
 		milestones: selectedEscrowMilestones,
 	});
 	const localWorkroomState = selectedDeal
-		? workroomStateByEscrow[selectedDeal.id] ??
-			createInitialWorkroomState(selectedDeal.id, selectedEscrowMilestones)
+		? (workroomStateByEscrow[selectedDeal.id] ??
+			createInitialWorkroomState(selectedDeal.id, selectedEscrowMilestones))
 		: createInitialWorkroomState("0", []);
 	const workroomState = selectedDeal
 		? {
@@ -182,7 +205,7 @@ export function EscrowDetailView({
 			}
 		: createInitialWorkroomState("0", []);
 	const changeRequestDrafts = selectedDeal
-		? changeRequestDraftsByEscrow[selectedDeal.id] ?? {}
+		? (changeRequestDraftsByEscrow[selectedDeal.id] ?? {})
 		: {};
 
 	const refreshEscrows = async () => {
@@ -325,7 +348,8 @@ export function EscrowDetailView({
 		}
 
 		const draft =
-			workroomState.draftsByMilestone[milestone.id] ?? createEmptyWorkroomDraft();
+			workroomState.draftsByMilestone[milestone.id] ??
+			createEmptyWorkroomDraft();
 		const hasWorkroomContent =
 			draft.deliveryNote.trim().length > 0 ||
 			draft.links.some((item) => item.label.trim() || item.url.trim()) ||
@@ -509,7 +533,10 @@ export function EscrowDetailView({
 		const normalizedAmount = resolutionRecipientAmount.trim() || "0";
 
 		try {
-			const recipientAmount = parseUnits(normalizedAmount, fundingTokenDecimals);
+			const recipientAmount = parseUnits(
+				normalizedAmount,
+				fundingTokenDecimals,
+			);
 			if (recipientAmount > milestone.amountValue) {
 				return;
 			}
@@ -580,7 +607,8 @@ export function EscrowDetailView({
 						</button>
 					</div>
 					<div className="mt-5 rounded-xl border border-dashed border-border/70 px-4 py-6 text-sm text-muted-foreground">
-						This escrow was not found for the connected wallet on the selected network.
+						This escrow was not found for the connected wallet on the selected
+						network.
 					</div>
 				</div>
 			</div>
@@ -860,7 +888,7 @@ function MilestoneCard({
 	) => Promise<void>;
 	onSaveChangeRequest: (milestone: TimelineMilestone) => Promise<void>;
 }) {
-	const now = BigInt(Math.floor(Date.now() / 1000));
+	const now = useNowUnixSeconds();
 	const escrowAllowsMilestoneActions =
 		selectedDeal.rawStatus === ESCROW_STATUS.LIVE ||
 		selectedDeal.rawStatus === ESCROW_STATUS.IN_REVIEW ||
@@ -976,7 +1004,10 @@ function MilestoneCard({
 			</div>
 
 			<div className="mt-3 flex flex-wrap gap-2">
-				<ApprovalChip label="Client approval" active={milestone.clientApproved} />
+				<ApprovalChip
+					label="Client approval"
+					active={milestone.clientApproved}
+				/>
 				<ApprovalChip
 					label="Recipient approval"
 					active={milestone.recipientApproved}
@@ -998,7 +1029,8 @@ function MilestoneCard({
 							Workroom
 						</p>
 						<p className="mt-2 text-sm leading-6 text-muted-foreground">
-							Deliverables, links, document attachments, and revision notes for this milestone.
+							Deliverables, links, document attachments, and revision notes for
+							this milestone.
 						</p>
 					</div>
 					{participantRole === "recipient" ? (
@@ -1025,7 +1057,8 @@ function MilestoneCard({
 											Revision {submission.revisionNumber}
 										</p>
 										<p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-											{submission.submittedByWalletLabel} | {submission.submittedAtLabel}
+											{submission.submittedByWalletLabel} |{" "}
+											{submission.submittedAtLabel}
 										</p>
 									</div>
 									<span className="ui-chip px-2.5 py-1 text-[11px]">
@@ -1120,10 +1153,13 @@ function MilestoneCard({
 				{canComposeWorkroom ? (
 					<div className="mt-4 rounded-xl border border-border/70 bg-background/25 p-3.5">
 						<p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted">
-							{participantRole === "client" ? "Share update" : "Prepare submission"}
+							{participantRole === "client"
+								? "Share update"
+								: "Prepare submission"}
 						</p>
 						<p className="mt-2 text-sm leading-6 text-muted-foreground">
-							Both sides can share files, links, and notes here. Only the recipient can formally submit the milestone for review.
+							Both sides can share files, links, and notes here. Only the
+							recipient can formally submit the milestone for review.
 						</p>
 						<label className="mt-3 block">
 							<span className="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-muted">
@@ -1254,7 +1290,9 @@ function MilestoneCard({
 
 						<div className="mt-4 flex flex-wrap gap-2">
 							<ActionButton
-								label={participantRole === "client" ? "Post update" : "Save update"}
+								label={
+									participantRole === "client" ? "Post update" : "Save update"
+								}
 								onClick={() => onSaveDraft(milestone, "shared")}
 								variant="secondary"
 								disabled={isUploadingFiles || isPersistingWorkroom}
@@ -1284,7 +1322,8 @@ function MilestoneCard({
 							Request changes
 						</p>
 						<p className="mt-2 text-sm leading-6 text-muted-foreground">
-							This is an offchain workroom note for the recipient. Use dispute if the issue needs onchain escalation.
+							This is an offchain workroom note for the recipient. Use dispute
+							if the issue needs onchain escalation.
 						</p>
 						<textarea
 							value={changeRequestDraft}
@@ -1378,7 +1417,11 @@ function MilestoneCard({
 					) : null}
 					{allowDispute ? (
 						<ActionButton
-							label={openDisputeFor === milestone.id ? "Close dispute" : "Open dispute"}
+							label={
+								openDisputeFor === milestone.id
+									? "Close dispute"
+									: "Open dispute"
+							}
 							onClick={() => {
 								setOpenResolutionFor(null);
 								setOpenDisputeFor((current) =>
@@ -1392,7 +1435,11 @@ function MilestoneCard({
 					) : null}
 					{allowResolution ? (
 						<ActionButton
-							label={openResolutionFor === milestone.id ? "Close resolution" : "Resolve dispute"}
+							label={
+								openResolutionFor === milestone.id
+									? "Close resolution"
+									: "Resolve dispute"
+							}
 							onClick={() => {
 								setOpenDisputeFor(null);
 								setOpenResolutionFor((current) =>
@@ -1544,24 +1591,29 @@ function ActionNotice({
 	let message = "This escrow is visible to your connected wallet.";
 
 	if (role === "client" && canFundSelectedDeal) {
-		message = "You created this escrow. Fund it to move the agreement from draft to live.";
+		message =
+			"You created this escrow. Fund it to move the agreement from draft to live.";
 	} else if (
 		role === "recipient" &&
 		selectedDeal.rawStatus === ESCROW_STATUS.AWAITING_FUNDING
 	) {
-		message = "You are the recipient on this deal. It will become active once the client funds it.";
+		message =
+			"You are the recipient on this deal. It will become active once the client funds it.";
 	} else if (
 		role === "recipient" &&
 		selectedDeal.rawStatus === ESCROW_STATUS.LIVE
 	) {
-		message = "You are the recipient on this deal. Submit milestones here as each delivery is ready.";
+		message =
+			"You are the recipient on this deal. Submit milestones here as each delivery is ready.";
 	} else if (
 		role === "client" &&
 		selectedDeal.rawStatus === ESCROW_STATUS.LIVE
 	) {
-		message = "You are the client on this deal. Review milestones, approve releases, and refund when needed.";
+		message =
+			"You are the client on this deal. Review milestones, approve releases, and refund when needed.";
 	} else if (role === "resolver") {
-		message = "You are configured as resolver on this deal. Disputed milestones can be settled from this view.";
+		message =
+			"You are configured as resolver on this deal. Disputed milestones can be settled from this view.";
 	}
 
 	return (
@@ -1641,13 +1693,7 @@ function RolePill({ role }: { role: ParticipantRole }) {
 	return <span className="ui-chip px-2.5 py-1 text-[11px]">{label}</span>;
 }
 
-function ApprovalChip({
-	label,
-	active,
-}: {
-	label: string;
-	active: boolean;
-}) {
+function ApprovalChip({ label, active }: { label: string; active: boolean }) {
 	return (
 		<span
 			className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -1713,7 +1759,9 @@ function LedgerStatusBadge({
 function NetworkBanner({ networkLabel }: { networkLabel: string }) {
 	return (
 		<div className="rounded-2xl border border-[rgba(255,209,102,0.22)] bg-[linear-gradient(180deg,rgba(255,209,102,0.12),rgba(255,209,102,0.04)),rgba(24,19,11,0.88)] px-4 py-3 text-sm text-[#fff0c9]">
-			Switch the wallet to {networkLabel} to approve, fund, or manage these escrows. The detail view is pinned to the deployed contracts on that network.
+			Switch the wallet to {networkLabel} to approve, fund, or manage these
+			escrows. The detail view is pinned to the deployed contracts on that
+			network.
 		</div>
 	);
 }
@@ -1764,7 +1812,9 @@ function buildAttachmentStoragePath({
 	fileName: string;
 	index: number;
 }) {
-	const extension = fileName.includes(".") ? `.${fileName.split(".").pop()}` : "";
+	const extension = fileName.includes(".")
+		? `.${fileName.split(".").pop()}`
+		: "";
 	const normalizedBaseName = fileName
 		.replace(/\.[^/.]+$/, "")
 		.toLowerCase()

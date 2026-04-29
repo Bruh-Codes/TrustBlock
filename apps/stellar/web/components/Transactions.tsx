@@ -30,7 +30,7 @@ export function Transactions({
 		address,
 	} = useEscrows();
 	const [recentTransaction, setRecentTransaction] =
-		useState<RecentTransactionState | null>(null);
+		useState<RecentTransactionState | null>(() => loadRecentTransaction());
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -38,7 +38,6 @@ export function Transactions({
 	const networkLabel = "Stellar TESTNET";
 
 	useEffect(() => {
-		setRecentTransaction(loadRecentTransaction());
 		return subscribeToRecentTransaction(setRecentTransaction);
 	}, []);
 
@@ -53,7 +52,8 @@ export function Transactions({
 		<div className="mx-auto flex max-w-6xl flex-col gap-6">
 			{isConnected && !isOnDeploymentChain ? (
 				<div className="rounded-2xl border border-[rgba(255,209,102,0.22)] bg-[linear-gradient(180deg,rgba(255,209,102,0.12),rgba(255,209,102,0.04)),rgba(24,19,11,0.88)] px-4 py-3 text-sm text-[#fff0c9]">
-					Switch the wallet to {networkLabel} to manage these escrows. The ledger is pinned to the deployed Soroban contract on that network.
+					Switch the wallet to {networkLabel} to manage these escrows. The
+					ledger is pinned to the deployed Soroban contract on that network.
 				</div>
 			) : null}
 
@@ -67,7 +67,8 @@ export function Transactions({
 							Escrows for this wallet
 						</h2>
 						<p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-							Open any escrow to view milestones, current approvals, and the next actions for the connected party.
+							Open any escrow to view milestones, current approvals, and the
+							next actions for the connected party.
 						</p>
 					</div>
 					<div className="flex flex-wrap gap-2">
@@ -177,10 +178,7 @@ export function Transactions({
 									</div>
 									<div className="mt-4 grid gap-2.5 sm:grid-cols-3">
 										<SummaryMetric label="Value" value={deal.amount} />
-										<SummaryMetric
-											label="Released"
-											value={deal.released}
-										/>
+										<SummaryMetric label="Released" value={deal.released} />
 										<SummaryMetric
 											label="Milestones"
 											value={`${deal.completedMilestones}/${deal.totalMilestones}`}
@@ -214,13 +212,7 @@ export function Transactions({
 	);
 }
 
-function SummaryMetric({
-	label,
-	value,
-}: {
-	label: string;
-	value: string;
-}) {
+function SummaryMetric({ label, value }: { label: string; value: string }) {
 	return (
 		<div className="rounded-xl border border-border/70 bg-background/25 p-3">
 			<p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">

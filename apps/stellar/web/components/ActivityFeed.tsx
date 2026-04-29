@@ -28,10 +28,11 @@ function formatRelativeTime(timestamp: string) {
 }
 
 export function ActivityFeed() {
-	const [items, setItems] = useState<ActivityFeedItem[]>([]);
+	const [items, setItems] = useState<ActivityFeedItem[]>(() =>
+		loadActivityFeed(),
+	);
 
 	useEffect(() => {
-		setItems(loadActivityFeed());
 		return subscribeToActivityFeed(setItems);
 	}, []);
 
@@ -94,7 +95,8 @@ export function ActivityFeed() {
 					))
 				) : (
 					<div className="rounded-xl border border-dashed border-border/70 px-4 py-6 text-sm text-muted-foreground">
-						Create or update an escrow to populate the live Stellar activity feed.
+						Create or update an escrow to populate the live Stellar activity
+						feed.
 					</div>
 				)}
 			</div>

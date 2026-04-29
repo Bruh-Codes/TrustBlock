@@ -1,11 +1,21 @@
 # TrustBlock
 
-TrustBlock is a milestone-based escrow platform for structured crypto payments on Arbitrum.
+TrustBlock is a milestone-based escrow platform for structured crypto payments, implemented for both EVM and Stellar networks.
 
-The repository contains two main applications:
+## Dual Implementation
+
+This repository contains two implementations of TrustBlock:
+
+### EVM Version (Arbitrum)
 
 - `apps/smart-contracts`: upgradeable escrow contracts, read helpers, deployment modules, and tests
 - `apps/web`: the product UI, wallet connection flow, and escrow drafting interface
+
+### Stellar Version
+
+- `stellar-dApp/`: Complete Stellar implementation with Soroban smart contracts and frontend
+  - `contracts/`: Soroban smart contracts for escrow functionality
+  - `frontend/`: React-based frontend for Stellar wallet integration
 
 TrustBlock is being prepared as both an open-source project and a hackathon submission. This documentation is written to reflect the current implementation accurately, without claiming features that are not yet wired end to end.
 
@@ -58,7 +68,9 @@ What is implemented today:
 
 ## Quick Start
 
-### Smart contracts
+### EVM Version
+
+#### Smart contracts
 
 ```bash
 cd apps/smart-contracts
@@ -93,6 +105,24 @@ NEXT_PUBLIC_ESCROW_DEPLOYMENT=arbitrumSepolia
 
 Switch `NEXT_PUBLIC_ESCROW_DEPLOYMENT` to `arbitrum` to target the mainnet deployment registry.
 
+### Stellar Version
+
+#### Smart contracts
+
+```bash
+cd stellar-dApp/contracts
+soroban contract build
+soroban contract test
+```
+
+#### Frontend
+
+```bash
+cd stellar-dApp/frontend
+npm install
+npm run dev
+```
+
 ## Docs
 
 - Architecture overview: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
@@ -103,9 +133,6 @@ Switch `NEXT_PUBLIC_ESCROW_DEPLOYMENT` to `arbitrum` to target the mainnet deplo
 ## Contributing
 
 Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening a pull request.
-
-## Feedbacks
-https://docs.google.com/spreadsheets/d/1Q-HN9M1OJNaNh_1g3KFRfPq4aL0l0JI27n1Og1XO6ps/edit?resourcekey=&gid=1847759737#gid=1847759737
 
 ## Security
 

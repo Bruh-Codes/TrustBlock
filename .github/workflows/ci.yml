@@ -20,7 +20,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run contract tests
-        run: cargo test --locked
+        run: cargo test
 
   stellar-web-checks:
     name: Stellar Web Checks

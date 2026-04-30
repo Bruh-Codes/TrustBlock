@@ -8,6 +8,7 @@ import { EscrowDetailView } from "@/components/EscrowDetailView";
 import { Overview } from "@/components/Overview";
 import { AppSidebar } from "@/components/Sidebar";
 import { MobileSidebarToggle } from "@/components/SidebarToggle";
+import { TrustBlockLogoMark } from "@/components/TrustBlockLogo";
 import { Transactions } from "@/components/Transactions";
 import { WalletButton } from "@/components/WalletButton";
 import { Button } from "@/components/ui/button";
@@ -94,7 +95,9 @@ function PageContent() {
 
 				<div className="relative flex min-h-screen w-full overflow-visible">
 					<AppSidebar
-						currentView={currentView === "escrow" ? "transactions" : currentView}
+						currentView={
+							currentView === "escrow" ? "transactions" : currentView
+						}
 						setCurrentView={setCurrentView}
 					/>
 					<SidebarInset className="bg-transparent shadow-none">
@@ -103,6 +106,10 @@ function PageContent() {
 							<section className="mx-auto mb-8 max-w-6xl pt-3 sm:mb-10 sm:pt-4">
 								<div className="flex flex-wrap items-start justify-between gap-5">
 									<div className="min-w-0">
+										<div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/35 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+											<TrustBlockLogoMark className="h-4 w-4" />
+											TrustBlock
+										</div>
 										<h1 className="text-[1.85rem] font-semibold tracking-[-0.03em] text-foreground sm:text-[2.35rem]">
 											{current.title}
 										</h1>

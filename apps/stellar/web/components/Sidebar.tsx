@@ -31,7 +31,7 @@ const data = {
     {
       name: "TrustBlock",
       logo: GalleryVerticalEnd,
-      plan: "Workspace",
+      plan: "",
     },
   ],
   navMain: [

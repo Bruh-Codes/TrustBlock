@@ -1,1 +1,0 @@
-ALTER TYPE "public"."workroom_submission_status" ADD VALUE 'shared' BEFORE 'submitted';
